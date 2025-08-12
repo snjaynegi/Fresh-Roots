@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "@/hooks/use-toast";
@@ -43,60 +42,24 @@ interface User {
   password?: string;
 }
 
-// Get registered users from localStorage or generate mock data
-const getUsers = (): User[] => {
-  const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-  
-  // If there are stored users, enhance them with required properties
-  if (storedUsers.length > 0) {
-    return storedUsers.map((user: any) => ({
-      ...user,
-      status: user.status || "active",
-      registrationDate: user.registrationDate || new Date().toISOString().split('T')[0],
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(user.name)}`
-    }));
-  }
-  
-  // Otherwise generate mock users
-  return generateMockUsers(15);
-};
-
-// Generate mock users data
-const generateMockUsers = (count: number): User[] => {
-  const users: User[] = [];
-  const statuses: ("active" | "inactive")[] = ["active", "inactive"];
-  const domains = ["gmail.com", "yahoo.com", "outlook.com", "hotmail.com", "example.com"];
-  
-  for (let i = 1; i <= count; i++) {
-    const firstName = ["John", "Alice", "Robert", "Emma", "Michael", "Sophia", "William", "Olivia"][
-      Math.floor(Math.random() * 8)
-    ];
-    const lastName = ["Smith", "Johnson", "Brown", "Davis", "Wilson", "Miller", "Taylor", "Anderson"][
-      Math.floor(Math.random() * 8)
-    ];
-    const name = `${firstName} ${lastName}`;
-    const email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 1000)}@${
-      domains[Math.floor(Math.random() * domains.length)]
-    }`;
-    
-    const status = statuses[Math.floor(Math.random() * statuses.length)];
-    const day = Math.floor(Math.random() * 28) + 1;
-    const month = Math.floor(Math.random() * 12) + 1;
-    const year = 2023 - Math.floor(Math.random() * 2);
-    const registrationDate = `${year}-${month.toString().padStart(2, "0")}-${day.toString().padStart(2, "0")}`;
-    
-    users.push({
-      id: `user-${i}`,
-      name,
-      email,
-      status,
-      password: "password",
-      registrationDate,
-      avatar: `https://api.dicebear.com/7.x/initials/svg?seed=${encodeURIComponent(name)}`
+// Replace the getUsers function to fetch users via API
+const getUsers = async (): Promise<User[]> => {
+  try {
+    const response = await fetch('/api/admin/list-users');
+    if (!response.ok) {
+      throw new Error('Failed to fetch users');
+    }
+    const users = await response.json();
+    return users;
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    toast({
+      title: "Error",
+      description: "Failed to fetch users. Please try again.",
+      variant: "destructive",
     });
+    return [];
   }
-  
-  return users;
 };
 
 const AdminUsers = () => {
@@ -121,15 +84,6 @@ const AdminUsers = () => {
       user.id === currentUser.id ? { ...user, password: "password" } : user
     ));
     
-    // Update users in localStorage if needed
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    if (storedUsers.length > 0) {
-      const updatedUsers = storedUsers.map((user: any) => 
-        user.id === currentUser.id ? { ...user, password: "password" } : user
-      );
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-    }
-    
     setIsResetPasswordDialogOpen(false);
     
     toast({
@@ -140,7 +94,12 @@ const AdminUsers = () => {
 
   // Initialize with registered users or mock users
   useEffect(() => {
-    setUsers(getUsers());
+    const fetchUsers = async () => {
+      const usersFromSupabase = await getUsers();
+      setUsers(usersFromSupabase);
+    };
+
+    fetchUsers();
   }, []);
 
   // Filter users based on search and status
@@ -161,51 +120,79 @@ const AdminUsers = () => {
     setFilteredUsers(filtered);
   }, [users, searchQuery, statusFilter]);
 
-  // Delete user
-  const handleDeleteUser = () => {
+  // Update handleDeleteUser to call the delete-user API
+  const handleDeleteUser = async () => {
     if (!currentUser) return;
-    
-    setUsers(prev => prev.filter(user => user.id !== currentUser.id));
-    setIsDeleteDialogOpen(false);
-    
-    toast({
-      title: t("User Deleted"),
-      description: t("The user has been permanently deleted")
-    });
+
+    try {
+      const response = await fetch('/api/admin/delete-user', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: currentUser.id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      setUsers(prev => prev.filter(user => user.id !== currentUser.id));
+      setIsDeleteDialogOpen(false);
+
+      toast({
+        title: t("User Deleted"),
+        description: t("The user has been permanently deleted")
+      });
+
+      // Refresh the user list
+      const updatedUsers = await getUsers();
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  // Update user status
-  const handleUpdateStatus = () => {
+  // Update handleUpdateStatus to call the update-user-status API
+  const handleUpdateStatus = async () => {
     if (!currentUser) return;
-    
-    setUsers(prev => prev.map(user => 
-      user.id === currentUser.id ? { ...user, status: newStatus } : user
-    ));
-    
-    // Update users in localStorage
-    const storedUsers = JSON.parse(localStorage.getItem("users") || "[]");
-    if (storedUsers.length > 0) {
-      const updatedUsers = storedUsers.map((user: any) => 
-        user.id === currentUser.id ? { ...user, status: newStatus } : user
-      );
-      localStorage.setItem("users", JSON.stringify(updatedUsers));
-      
-      // If user is deactivated, check if they are currently logged in and log them out
-      if (newStatus === "inactive") {
-        const currentLoggedInUser = JSON.parse(localStorage.getItem("currentUser") || "{}");
-        if (currentLoggedInUser.id === currentUser.id) {
-          localStorage.removeItem("isLoggedIn");
-          localStorage.removeItem("currentUser");
-        }
+
+    try {
+      const response = await fetch('/api/admin/update-user-status', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: currentUser.id, status: newStatus }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update user status');
       }
+
+      setUsers(prev => prev.map(user =>
+        user.id === currentUser.id ? { ...user, status: newStatus } : user
+      ));
+
+      setIsStatusDialogOpen(false);
+
+      toast({
+        title: t("Status Updated"),
+        description: `${currentUser.name} ${newStatus === "active" ? t("activated") : t("deactivated")}`
+      });
+
+      // Refresh the user list
+      const updatedUsers = await getUsers();
+      setUsers(updatedUsers);
+    } catch (error) {
+      console.error('Error updating user status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update user status. Please try again.",
+        variant: "destructive",
+      });
     }
-    
-    setIsStatusDialogOpen(false);
-    
-    toast({
-      title: t("Status Updated"),
-      description: `${currentUser.name} ${newStatus === "active" ? t("activated") : t("deactivated")}`
-    });
   };
 
   return (

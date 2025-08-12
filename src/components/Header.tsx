@@ -46,9 +46,9 @@ const Header = ({ showSearch, searchQuery, onSearchChange }: HeaderProps) => {
           <Link 
             to="/" 
             className="text-2xl font-bold text-[#4F7942] hover:text-primary transition-colors dark:text-green-400"
-            aria-label={t("Desi Grocery")}
+            aria-label={t("FreshRoot")}
           >
-            {t("Desi Grocery")}
+            {t("FreshRoot")}
           </Link>
 
           <div className="flex items-center space-x-6">
