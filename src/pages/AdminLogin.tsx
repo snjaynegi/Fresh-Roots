@@ -23,10 +23,6 @@ const AdminLogin = () => {
     if (username === "admin" && password === "admin123") {
       // Set admin auth in localStorage
       localStorage.setItem("adminAuth", "true");
-      toast({
-        title: t("Login Successful"),
-        description: t("Welcome to the admin dashboard"),
-      });
       navigate("/admin");
     } else {
       toast({

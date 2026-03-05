@@ -16,6 +16,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { useNavigate } from "react-router-dom";
 import { toast } from "@/components/ui/use-toast";
 
@@ -31,13 +41,19 @@ const Header = ({ showSearch, searchQuery, onSearchChange }: HeaderProps) => {
   const { isDarkMode, toggleDarkMode } = useTheme();
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
-  const handleLogout = async () => {
+  const confirmLogout = async () => {
     await signOut();
+    setIsLogoutDialogOpen(false);
     toast({
       title: t("Logged out"),
       description: t("You have been successfully logged out"),
     });
+  };
+
+  const handleLogoutClick = () => {
+    setIsLogoutDialogOpen(true);
   };
 
   return (
@@ -93,7 +109,7 @@ const Header = ({ showSearch, searchQuery, onSearchChange }: HeaderProps) => {
                     {t("Order History")}
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleLogout} className="text-red-500 dark:text-red-400 cursor-pointer">
+                  <DropdownMenuItem onClick={handleLogoutClick} className="text-red-500 dark:text-red-400 cursor-pointer">
                     <LogOut className="w-4 h-4 mr-2" />
                     {t("Logout")}
                   </DropdownMenuItem>
@@ -163,6 +179,23 @@ const Header = ({ showSearch, searchQuery, onSearchChange }: HeaderProps) => {
           </div>
         )}
       </div>
+
+      <AlertDialog open={isLogoutDialogOpen} onOpenChange={setIsLogoutDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t("Confirm Logout")}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t("Are you sure you want to logout? You will need to login again to access your account.")}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t("Cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLogout} className="bg-red-600 hover:bg-red-700">
+              {t("Logout")}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </header>
   );
 };

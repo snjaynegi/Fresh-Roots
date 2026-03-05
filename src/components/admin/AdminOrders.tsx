@@ -133,7 +133,7 @@ const AdminOrders = () => {
               <TableRow>
                 <TableCell colSpan={6} className="text-center py-8">{t("No orders found")}</TableCell>
               </TableRow>
-            ) : (
+            ) :
               filteredOrders.map((order) => (
                 <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id}</TableCell>
