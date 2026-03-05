@@ -27,7 +27,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 // Mock Order Interface
 interface Order {
@@ -40,13 +40,8 @@ interface Order {
   paymentMethod: string;
 }
 
-const mockOrders: Order[] = [
-  { id: "ORD-001", customer: "John Doe", date: "2023-10-25", total: 1200, status: "delivered", items: 3, paymentMethod: "Credit Card" },
-  { id: "ORD-002", customer: "Jane Smith", date: "2023-10-26", total: 850, status: "processing", items: 2, paymentMethod: "PayPal" },
-  { id: "ORD-003", customer: "Bob Johnson", date: "2023-10-27", total: 2300, status: "pending", items: 5, paymentMethod: "UPI" },
-  { id: "ORD-004", customer: "Alice Brown", date: "2023-10-28", total: 450, status: "shipped", items: 1, paymentMethod: "COD" },
-  { id: "ORD-005", customer: "Charlie Wilson", date: "2023-10-29", total: 3200, status: "cancelled", items: 8, paymentMethod: "Credit Card" },
-];
+// Initial empty state
+const mockOrders: Order[] = [];
 
 const AdminOrders = () => {
   const { t } = useTranslation();
@@ -134,8 +129,13 @@ const AdminOrders = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredOrders.map((order) => (
-              <TableRow key={order.id}>
+            {filteredOrders.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={6} className="text-center py-8">{t("No orders found")}</TableCell>
+              </TableRow>
+            ) : (
+              filteredOrders.map((order) => (
+                <TableRow key={order.id}>
                 <TableCell className="font-medium">{order.id}</TableCell>
                 <TableCell>{order.customer}</TableCell>
                 <TableCell>{order.date}</TableCell>

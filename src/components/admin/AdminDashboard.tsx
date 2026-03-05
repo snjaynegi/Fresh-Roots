@@ -24,53 +24,40 @@ import { Badge } from "@/components/ui/badge";
 const AdminDashboard = () => {
   const { t } = useTranslation();
 
-  // Mock Data for Charts
-  const salesData = [
-    { name: "Mon", sales: 4000 },
-    { name: "Tue", sales: 3000 },
-    { name: "Wed", sales: 2000 },
-    { name: "Thu", sales: 2780 },
-    { name: "Fri", sales: 1890 },
-    { name: "Sat", sales: 2390 },
-    { name: "Sun", sales: 3490 },
-  ];
+  // Initial empty state
+  const salesData: { name: string; sales: number }[] = [];
 
-  // Mock Data for Recent Orders
-  const recentOrders = [
-    { id: "ORD-001", customer: "John Doe", total: 1200, status: "completed" },
-    { id: "ORD-002", customer: "Jane Smith", total: 850, status: "processing" },
-    { id: "ORD-003", customer: "Bob Johnson", total: 2300, status: "pending" },
-    { id: "ORD-004", customer: "Alice Brown", total: 450, status: "completed" },
-  ];
+  // Initial empty state
+  const recentOrders: { id: string; customer: string; total: number; status: string }[] = [];
 
   const stats = [
     {
       title: "Total Revenue",
-      value: "₹45,231.89",
-      description: "+20.1% from last month",
+      value: "₹0.00",
+      description: "No data available",
       icon: DollarSign,
-      color: "text-green-600",
+      color: "text-gray-400",
     },
     {
       title: "Orders",
-      value: "+2350",
-      description: "+180.1% from last month",
+      value: "0",
+      description: "No data available",
       icon: ShoppingCart,
-      color: "text-blue-600",
+      color: "text-gray-400",
     },
     {
       title: "Active Products",
-      value: "12,234",
-      description: "+19% from last month",
+      value: "0",
+      description: "No data available",
       icon: Package,
-      color: "text-orange-600",
+      color: "text-gray-400",
     },
     {
       title: "Active Users",
-      value: "+573",
-      description: "+201 since last hour",
+      value: "0",
+      description: "No data available",
       icon: Users,
-      color: "text-purple-600",
+      color: "text-gray-400",
     },
   ];
 
@@ -106,36 +93,40 @@ const AdminDashboard = () => {
             <CardDescription>{t("Weekly sales performance")}</CardDescription>
           </CardHeader>
           <CardContent className="pl-2">
-            <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={salesData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} />
-                  <XAxis 
-                    dataKey="name" 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                  />
-                  <YAxis 
-                    stroke="#888888" 
-                    fontSize={12} 
-                    tickLine={false} 
-                    axisLine={false} 
-                    tickFormatter={(value) => `₹${value}`} 
-                  />
-                  <Tooltip 
-                    cursor={{ fill: 'transparent' }}
-                    contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                  />
-                  <Bar 
-                    dataKey="sales" 
-                    fill="#4F7942" 
-                    radius={[4, 4, 0, 0]} 
-                    barSize={40}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
+            <div className="h-[300px] w-full flex items-center justify-center">
+              {salesData.length > 0 ? (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={salesData}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis 
+                      dataKey="name" 
+                      stroke="#888888" 
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                    />
+                    <YAxis 
+                      stroke="#888888" 
+                      fontSize={12} 
+                      tickLine={false} 
+                      axisLine={false} 
+                      tickFormatter={(value) => `₹${value}`} 
+                    />
+                    <Tooltip 
+                      cursor={{ fill: 'transparent' }}
+                      contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                    />
+                    <Bar 
+                      dataKey="sales" 
+                      fill="#4F7942" 
+                      radius={[4, 4, 0, 0]} 
+                      barSize={40}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <div className="text-gray-400 text-sm">{t("No sales data available")}</div>
+              )}
             </div>
           </CardContent>
         </Card>

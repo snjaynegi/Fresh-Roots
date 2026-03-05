@@ -53,11 +53,7 @@ const getUsers = async (): Promise<User[]> => {
     return users;
   } catch (error) {
     console.error('Error fetching users:', error);
-    toast({
-      title: "Error",
-      description: "Failed to fetch users. Please try again.",
-      variant: "destructive",
-    });
+    // Return empty array if API fails
     return [];
   }
 };
@@ -332,7 +328,7 @@ const AdminUsers = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("Delete User")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("Are you sure you want to delete this user? This action cannot be undone.")}
+              {t("Are you sure you want to delete")} <span className="font-semibold">{currentUser?.name}</span>? {t("This action cannot be undone.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -353,8 +349,9 @@ const AdminUsers = () => {
             </AlertDialogTitle>
             <AlertDialogDescription>
               {newStatus === "active"
-                ? t("Are you sure you want to activate this user?")
-                : t("Are you sure you want to deactivate this user? They will not be able to login.")}
+                ? <span>{t("Are you sure you want to activate")} <span className="font-semibold">{currentUser?.name}</span>?</span>
+                : <span>{t("Are you sure you want to deactivate")} <span className="font-semibold">{currentUser?.name}</span>? {t("They will not be able to login.")}</span>
+              }
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -372,7 +369,7 @@ const AdminUsers = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>{t("Reset Password")}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t("Are you sure you want to reset this user's password to the default password? The user will need to change it on their next login.")}
+              {t("Are you sure you want to reset password for")} <span className="font-semibold">{currentUser?.name}</span>? {t("The user will need to change it on their next login.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

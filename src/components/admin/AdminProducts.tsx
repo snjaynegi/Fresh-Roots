@@ -237,7 +237,19 @@ const AdminProducts = () => {
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
           <h2 className="text-xl font-bold">{t("Product Inventory Management")}</h2>
-          <Button onClick={() => setIsAddDialogOpen(true)}>
+          <Button onClick={() => {
+            setCurrentProduct({
+              id: "",
+              name: "",
+              price: 0,
+              description: "",
+              category: "staples",
+              image: "",
+              inStock: true,
+              quantity: 0
+            });
+            setIsAddDialogOpen(true);
+          }}>
             <Plus size={16} className="mr-2" />
             {t("Add Product")}
           </Button>
