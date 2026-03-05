@@ -64,10 +64,10 @@ const Header = ({ showSearch, searchQuery, onSearchChange }: HeaderProps) => {
           <div className="flex items-center justify-between">
             <Link 
               to="/" 
-              className="text-2xl font-bold text-primary hover:text-primary/80 transition-colors dark:text-green-400"
-              aria-label={t("FreshRoot")}
+              className="flex items-center gap-2"
+              aria-label={t("Fresh Roots")}
             >
-              {t("FreshRoot")}
+              <img src="/logo.png" alt="Fresh Roots" className="h-24 w-auto object-contain" />
             </Link>
             
             {/* Mobile Menu Toggle could go here if needed */}

@@ -59,9 +59,17 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }: AdminSidebarProps) =
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader className="border-b p-4">
-        <div className="flex items-center gap-2 font-bold text-primary text-xl">
-          <span className="group-data-[collapsible=icon]:hidden">FreshRoots Admin</span>
-          <span className="hidden group-data-[collapsible=icon]:block">FR</span>
+        <div className="flex items-center justify-center font-bold text-primary text-xl">
+          <img 
+            src="/logo.png" 
+            alt="Fresh Roots Admin" 
+            className="group-data-[collapsible=icon]:hidden h-20 w-auto object-contain" 
+          />
+          <img 
+            src="/logo.png" 
+            alt="FR" 
+            className="hidden group-data-[collapsible=icon]:block h-12 w-12 object-contain" 
+          />
         </div>
       </SidebarHeader>
       

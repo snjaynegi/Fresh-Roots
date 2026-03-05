@@ -154,10 +154,6 @@ const Login = () => {
           password: "",
         });
         
-        toast({
-          title: t("Login Successful"),
-          description: t("Welcome to demo account!"),
-        });
         navigate(from);
         return;
       }
@@ -178,10 +174,6 @@ const Login = () => {
       }
       
       // Success
-      toast({
-        title: t("Login Successful"),
-        description: t("Welcome back!"),
-      });
       
       // Navigate to the page the user was trying to access, or home
       navigate(from);
