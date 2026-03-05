@@ -19,6 +19,8 @@ import AdminDashboard from "../components/admin/AdminDashboard";
 import AdminProducts from "../components/admin/AdminProducts";
 import AdminUsers from "../components/admin/AdminUsers";
 import AdminOrders from "../components/admin/AdminOrders";
+import AdminBanners from "../components/admin/AdminBanners";
+import AdminFreshArrivals from "../components/admin/AdminFreshArrivals";
 
 const Admin = () => {
   const { t } = useTranslation();
@@ -53,6 +55,10 @@ const Admin = () => {
         return <AdminUsers />;
       case "orders":
         return <AdminOrders />;
+      case "banners":
+        return <AdminBanners />;
+      case "fresh_arrivals":
+        return <AdminFreshArrivals />;
       default:
         return <AdminDashboard />;
     }

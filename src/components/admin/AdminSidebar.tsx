@@ -5,6 +5,8 @@ import {
   Users,
   LogOut,
   ChevronRight,
+  Image as ImageIcon,
+  Sparkles,
 } from "lucide-react";
 import {
   Sidebar,
@@ -48,6 +50,16 @@ const AdminSidebar = ({ activeTab, onTabChange, onLogout }: AdminSidebarProps) =
       id: "products",
       label: "Products",
       icon: Package,
+    },
+    {
+      id: "banners",
+      label: "Banners",
+      icon: ImageIcon,
+    },
+    {
+      id: "fresh_arrivals",
+      label: "Fresh Arrivals",
+      icon: Sparkles,
     },
     {
       id: "users",

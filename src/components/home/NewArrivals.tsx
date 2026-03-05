@@ -1,14 +1,33 @@
+import { useState, useEffect } from "react";
 import { motion } from 'framer-motion';
 import { Plane, Carrot, Apple, Wheat, ShoppingBasket } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { cmsService } from "../../services/cmsService";
+import { extendedProducts } from "@/data/products";
 
 const NewArrivals = () => {
-  const products = [
-    { id: 1, name: "Fresh Strawberries", price: "₹120", image: "https://images.unsplash.com/photo-1464965911861-746a04b4b0be?auto=format&fit=crop&q=80&w=500" },
-    { id: 2, name: "Organic Spinach", price: "₹45", image: "https://images.unsplash.com/photo-1576045057995-568f588f82fb?auto=format&fit=crop&q=80&w=500" },
-    { id: 3, name: "Sweet Corn", price: "₹30", image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?auto=format&fit=crop&q=80&w=500" },
-    { id: 4, name: "Red Bell Peppers", price: "₹80", image: "https://images.unsplash.com/photo-1563565375-f3fdfdbefa83?auto=format&fit=crop&q=80&w=500" },
-  ];
+  const [products, setProducts] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchFresh = async () => {
+      try {
+        const arrivals = await cmsService.getFreshArrivals();
+        if (arrivals.length > 0) {
+          const freshProducts = arrivals
+            .map(a => extendedProducts.find(p => p.id === a.product_id))
+            .filter(Boolean);
+          setProducts(freshProducts);
+        } else {
+          // Fallback to first 4 products if no fresh arrivals set
+          setProducts(extendedProducts.slice(0, 4));
+        }
+      } catch (e) {
+        console.error("Failed to fetch fresh arrivals", e);
+        setProducts(extendedProducts.slice(0, 4));
+      }
+    };
+    fetchFresh();
+  }, []);
 
   return (
     <section className="py-12 bg-white relative overflow-hidden">
