@@ -1,6 +1,7 @@
 import { useParams, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { toast } from "@/components/ui/use-toast";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
@@ -9,7 +10,9 @@ const ProductDetail = () => {
   const { id } = useParams();
   const { t } = useTranslation();
   const { dispatch } = useCart();
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const { user } = useAuth();
+  // Check both Supabase auth (user) and legacy demo auth (localStorage)
+  const isLoggedIn = user || localStorage.getItem("isLoggedIn") === "true";
 
   // For demo purposes, we'll use the same product data with additional fields
   const dummyProducts = [
