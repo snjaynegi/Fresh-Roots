@@ -136,7 +136,9 @@ const AdminDashboard = () => {
           <CardHeader>
             <CardTitle>{t("Recent Orders")}</CardTitle>
             <CardDescription>
-              {t("You made 265 sales this month.")}
+              {recentOrders.length > 0 
+                ? t("You made sales this month.") 
+                : t("No recent orders.")}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -149,20 +151,28 @@ const AdminDashboard = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {recentOrders.map((order) => (
-                  <TableRow key={order.id}>
-                    <TableCell className="font-medium">
-                      {order.id}
-                      <div className="hidden text-xs text-muted-foreground md:inline ml-2">
-                        <Badge variant={order.status === 'completed' ? 'default' : order.status === 'processing' ? 'secondary' : 'outline'} className="text-[10px] h-5 px-1">
-                          {order.status}
-                        </Badge>
-                      </div>
+                {recentOrders.length === 0 ? (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center py-4 text-muted-foreground">
+                      {t("No recent orders")}
                     </TableCell>
-                    <TableCell>{order.customer}</TableCell>
-                    <TableCell className="text-right">₹{order.total}</TableCell>
                   </TableRow>
-                ))}
+                ) : (
+                  recentOrders.map((order) => (
+                    <TableRow key={order.id}>
+                      <TableCell className="font-medium">
+                        {order.id}
+                        <div className="hidden text-xs text-muted-foreground md:inline ml-2">
+                          <Badge variant={order.status === 'completed' ? 'default' : order.status === 'processing' ? 'secondary' : 'outline'} className="text-[10px] h-5 px-1">
+                            {order.status}
+                          </Badge>
+                        </div>
+                      </TableCell>
+                      <TableCell>{order.customer}</TableCell>
+                      <TableCell className="text-right">₹{order.total}</TableCell>
+                    </TableRow>
+                  ))
+                )}
               </TableBody>
             </Table>
           </CardContent>
