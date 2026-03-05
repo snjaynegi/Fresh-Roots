@@ -20,7 +20,6 @@
 *   **Product Details**: In-depth product views with nutritional information, origin details, and quality scores.
 *   **Responsive Design**: Fully optimized for mobile, tablet, and desktop devices.
 *   **Dark Mode**: Beautiful, system-aware dark mode with a custom animated theme switcher (Sun/Moon with ambient effects).
-*   **Localization**: Multi-language support (i18n) ready for global accessibility.
 
 ### 🛠️ Admin Dashboard
 *   **Secure Access**: Dedicated admin login portal.
