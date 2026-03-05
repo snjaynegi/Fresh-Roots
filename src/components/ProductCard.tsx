@@ -182,7 +182,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow duration-200 animate-slideUp">
+    <div className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-soft-green hover:-translate-y-1 transition-all duration-300 animate-slideUp">
       <Link to={`/product/${product.id}`} className="block">
         <div className="aspect-square overflow-hidden bg-gray-100 relative">
           {imageError ? (
@@ -243,7 +243,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
         <p className="text-gray-600">₹{product.price}</p>
         <button
           onClick={handleAddToCart}
-          className="mt-4 w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors duration-200"
+          className="mt-4 w-full bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/20 transition-all duration-200"
         >
           {t("Add to Cart")}
         </button>
