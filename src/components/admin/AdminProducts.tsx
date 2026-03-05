@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -17,6 +17,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import {
   Dialog,
   DialogContent,
@@ -55,10 +65,14 @@ interface Product {
 const AdminProducts = () => {
   const { t } = useTranslation();
   const [products, setProducts] = useState<Product[]>([]);
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   
   // Dialog states
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
@@ -81,37 +95,49 @@ const AdminProducts = () => {
 
   // Initialize products from extendedProducts
   useEffect(() => {
-    // Convert extendedProducts to our Product structure
-    const formattedProducts = extendedProducts.map(product => ({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      description: product.description,
-      category: product.category,
-      image: product.image,
-      inStock: product.inStock,
-      quantity: Math.floor(Math.random() * 100) + 1 // Random quantity for demo
-    }));
-    setProducts(formattedProducts);
+    // Simulate API delay for skeleton demo
+    const timer = setTimeout(() => {
+      // Convert extendedProducts to our Product structure
+      const formattedProducts = extendedProducts.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        description: product.description,
+        category: product.category,
+        image: product.image,
+        inStock: product.inStock,
+        quantity: Math.floor(Math.random() * 100) + 1 // Random quantity for demo
+      }));
+      setProducts(formattedProducts);
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
   }, []);
 
   // Filter products based on search and category
-  useEffect(() => {
-    let filtered = [...products];
-    
-    if (searchQuery) {
-      filtered = filtered.filter(product => 
+  const filteredProducts = useMemo(() => {
+    return products.filter(product => {
+      const matchesSearch = 
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase())
-      );
-    }
-    
-    if (selectedCategory !== "all") {
-      filtered = filtered.filter(product => product.category === selectedCategory);
-    }
-    
-    setFilteredProducts(filtered);
+        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesCategory = selectedCategory === "all" || product.category === selectedCategory;
+      
+      return matchesSearch && matchesCategory;
+    });
   }, [products, searchQuery, selectedCategory]);
+
+  // Reset to first page on filter change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, selectedCategory]);
+
+  // Calculate pagination
+  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedProducts = useMemo(() => {
+    return filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+  }, [filteredProducts, startIndex, itemsPerPage]);
 
   // Handle product selection
   const toggleProductSelection = (productId: string) => {
@@ -288,12 +314,32 @@ const AdminProducts = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.length === 0 ? (
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-4 w-4" /></TableCell>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        <Skeleton className="h-10 w-10 rounded" />
+                        <div className="space-y-2">
+                          <Skeleton className="h-4 w-[150px]" />
+                          <Skeleton className="h-3 w-[100px]" />
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell><Skeleton className="h-4 w-20" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-12" /></TableCell>
+                    <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-16 ml-auto" /></TableCell>
+                  </TableRow>
+                ))
+              ) : filteredProducts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8">{t("No products found")}</TableCell>
                 </TableRow>
               ) : (
-                filteredProducts.map((product) => (
+                paginatedProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
                       <Checkbox 
@@ -304,16 +350,25 @@ const AdminProducts = () => {
                     </TableCell>
                     <TableCell className="font-medium">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0">
-                          {product.image && (
+                        <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex-shrink-0 relative">
+                          {product.image ? (
                             <img 
                               src={product.image} 
                               alt={product.name} 
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover transition-opacity duration-300 opacity-0"
+                              loading="lazy"
+                              onLoad={(e) => {
+                                (e.target as HTMLImageElement).style.opacity = '1';
+                              }}
                               onError={(e) => {
                                 (e.target as HTMLImageElement).src = '/placeholder.svg';
+                                (e.target as HTMLImageElement).style.opacity = '1';
                               }}
                             />
+                          ) : (
+                            <div className="w-full h-full bg-gray-200 flex items-center justify-center text-gray-400">
+                              <span className="text-xs">No Img</span>
+                            </div>
                           )}
                         </div>
                         <div>
@@ -362,6 +417,62 @@ const AdminProducts = () => {
             </TableBody>
           </Table>
         </div>
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-4">
+            <Pagination>
+              <PaginationContent>
+                <PaginationItem>
+                  <PaginationPrevious 
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+                
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => {
+                  if (
+                    page === 1 ||
+                    page === totalPages ||
+                    (page >= currentPage - 1 && page <= currentPage + 1)
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          isActive={page === currentPage}
+                          onClick={() => setCurrentPage(page)}
+                          className="cursor-pointer"
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    );
+                  }
+                  
+                  if (
+                    page === currentPage - 2 ||
+                    page === currentPage + 2
+                  ) {
+                    return (
+                      <PaginationItem key={page}>
+                        <PaginationEllipsis />
+                      </PaginationItem>
+                    );
+                  }
+                  
+                  return null;
+                })}
+
+                <PaginationItem>
+                  <PaginationNext 
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                  />
+                </PaginationItem>
+              </PaginationContent>
+            </Pagination>
+          </div>
+        )}
       </div>
 
       {/* Add Product Dialog */}
