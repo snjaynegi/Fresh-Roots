@@ -9,7 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "../context/AuthContext";
-import { supabase } from "@/integrations/supabase/client"; // Added missing import
+import { supabase } from "@/integrations/supabase/client";
+import { isValidEmail } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -53,7 +54,7 @@ const Login = () => {
     if (!formData.email) {
       newErrors.email = t("Email is required");
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!isValidEmail(formData.email)) {
       newErrors.email = t("Invalid email format");
       isValid = false;
     }
@@ -84,7 +85,7 @@ const Login = () => {
     }
     
     // Check for proper email format with comprehensive validation
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    if (!isValidEmail(email)) {
       setResetEmailError(t("Invalid email format"));
       return false;
     }

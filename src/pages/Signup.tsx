@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "../context/AuthContext";
 import { Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isValidEmail } from "@/lib/utils";
 
 const Signup = () => {
   const { t } = useTranslation();
@@ -58,7 +59,7 @@ const Signup = () => {
     if (!formData.email) {
       newErrors.email = t("Email is required");
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!isValidEmail(formData.email)) {
       newErrors.email = t("Invalid email format");
       isValid = false;
     }

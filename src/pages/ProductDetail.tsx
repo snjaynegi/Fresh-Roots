@@ -5,7 +5,6 @@ import { toast } from "@/components/ui/use-toast";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
 import CompactNutritionChart from "../components/CompactNutritionChart";
-import { dummyProducts } from "../data/products";
 import { generateNutritionData } from "../utils/nutritionGenerator";
 
 const ProductDetail = () => {
