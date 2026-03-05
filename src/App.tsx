@@ -12,6 +12,7 @@ import "./i18n/config";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import Products from "./pages/Products";
 import Cart from "./pages/Cart";
 import Wishlist from "./pages/Wishlist";
 import ProductDetail from "./pages/ProductDetail";
@@ -47,6 +48,7 @@ const App = () => {
                   <React.Suspense fallback={<div>Loading...</div>}>
                     <Routes>
                       <Route path="/" element={<Index />} />
+                      <Route path="/products" element={<Products />} />
                       <Route path="/login" element={<Login />} />
                       <Route path="/signup" element={<Signup />} />
                       <Route path="/product/:id" element={<ProductDetail />} />
